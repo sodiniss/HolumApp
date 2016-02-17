@@ -19,6 +19,20 @@
                 <category android:name="android.intent.category.Default" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".Connessione">
+                        <intent-filter>
+                            <action android:name="com.example.holum.holum4.Connessione" />
+                            <category android:name="android.intent.category.DEFAULT" />
+                        </intent-filter>
+        </activity>
+        <activity android:name=".Controlli">
+                  <intent-filter>
+                        <action android:name="com.example.holum.holum4.Controlli" />
+                       <category android:name="android.intent.category.DEFAULT" />
+                  </intent-filter>
+        </activity>
+
         <activity android:name=".Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,8 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Controlli" />
-        <activity android:name=".Connessione"></activity>
     </application>
 
 </manifest>
