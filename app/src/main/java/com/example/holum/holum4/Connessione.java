@@ -35,7 +35,7 @@ public class Connessione extends Activity{
     Button button; // bottone annulla o inizia ricerca
     BluetoothDevice device; //identifica il dispositivo con bluetooth attivo
     BluetoothSocket BTSocket; // è il socket con il quale il bluetoothdevice si connette a un altro device
-    private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // è un identificativo del servizio attivo. identifica una certa applicazione bluetooth
+    public static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // è un identificativo del servizio attivo. identifica una certa applicazione bluetooth
     HolumApp g;                 //var globale                                                                            //come se fosse un numero di porta. sia il client che il server devono averlo uguale
 
     @Override
@@ -145,8 +145,9 @@ public class Connessione extends Activity{
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
 
-            connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));        //prende elemento cliccato e lo passa al metodo
-
+            //connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));        //prende elemento cliccato e lo passa al metodo
+            ConnectThread connessione = new ConnectThread((BluetoothDevice) parent.getItemAtPosition(position), uuid);
+            connessione.start();
         }
     };
 
@@ -156,7 +157,7 @@ public class Connessione extends Activity{
 
     public void connectWithServer(BluetoothDevice device){         //metodo per creare la connessione con il server
 
-        BTAdapter.cancelDiscovery();       // selezionato il device dall'array, è necessario chiudere la discovery in quanto il device è già stato identificato
+       /* BTAdapter.cancelDiscovery();       // selezionato il device dall'array, è necessario chiudere la discovery in quanto il device è già stato identificato
         try{
 
             BTSocket = device.createRfcommSocketToServiceRecord(uuid);  //metodo che assegna a btsocket un canale con il quale comunicare con il servizio UUID
@@ -170,7 +171,8 @@ public class Connessione extends Activity{
 
         }catch(IOException e){
             Toast.makeText(Connessione.this,"IOException",  Toast.LENGTH_SHORT).show();
-        }
+        }*/
+
 
 
 
