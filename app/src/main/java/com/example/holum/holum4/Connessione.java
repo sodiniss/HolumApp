@@ -35,7 +35,6 @@ public class Connessione extends Activity {
     BluetoothSocket BTSocket;
     public static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
-    public Context context = getApplicationContext();
 
 
     @Override
@@ -133,6 +132,7 @@ public class Connessione extends Activity {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String nome = device.getName();
                 BTArrayAdapter.add(device);
                 BTArrayAdapter.notifyDataSetChanged();
             }
