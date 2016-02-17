@@ -8,7 +8,6 @@ import java.util.UUID;
 
 
 
-
 public class ConnectThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
