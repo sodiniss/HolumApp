@@ -33,9 +33,7 @@ public class Connessione extends Activity {
     Button button;
 
     BluetoothSocket BTSocket;
-    public static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-
-
+    private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +46,8 @@ public class Connessione extends Activity {
         BTArrayAdapter = new ArrayAdapter<BluetoothDevice>(Connessione.this, android.R.layout.simple_list_item_1);
         elencoDiscover.setAdapter(BTArrayAdapter);
         elencoDiscover.setOnItemClickListener(listener);
+
+
 
 
         if (!BTAdapter.isEnabled()) {
@@ -123,7 +123,6 @@ public class Connessione extends Activity {
         }
     }
 
-    // ricerca
     private final BroadcastReceiver ActionFoundReceiver = new BroadcastReceiver() {
 
         @Override
@@ -132,7 +131,6 @@ public class Connessione extends Activity {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                String nome = device.getName();
                 BTArrayAdapter.add(device);
                 BTArrayAdapter.notifyDataSetChanged();
             }
@@ -144,13 +142,12 @@ public class Connessione extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
 
-            //connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));
-            ConnectThread connessione = new ConnectThread((BluetoothDevice) parent.getItemAtPosition(position));
-            connessione.start();
+            connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));
+
+
         }
     };
 
-    /*
     public void connectWithServer(BluetoothDevice device){
 
         BTAdapter.cancelDiscovery();
@@ -161,10 +158,15 @@ public class Connessione extends Activity {
                 Toast.makeText(Connessione.this,"preso",  Toast.LENGTH_SHORT).show();
 
 
+
         }catch(IOException e){}
 
+
+
+
+
     }
-*/
+
 
 
     @Override

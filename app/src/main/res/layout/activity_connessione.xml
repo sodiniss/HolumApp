@@ -37,4 +37,6 @@
         android:onClick="gestisciRicerca"/>
 
 
+
+
 </RelativeLayout>
