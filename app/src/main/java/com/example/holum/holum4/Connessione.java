@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 
-public class Connessione extends Activity{
+public class Connessione extends Activity {
     BluetoothAdapter BTAdapter; //identifica l'hardware bluetooth del dispositivo
     public static int REQUEST_BLUETOOTH = 1; // richiesta per la startactivityforresult
     ArrayAdapter<BluetoothDevice> BTArrayAdapter; //array di bluetoothdevice di tipo adapter ---> per listview
@@ -35,7 +35,7 @@ public class Connessione extends Activity{
     Button button; // bottone annulla o inizia ricerca
     BluetoothDevice device; //identifica il dispositivo con bluetooth attivo
     BluetoothSocket BTSocket; // è il socket con il quale il bluetoothdevice si connette a un altro device
-    public static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // è un identificativo del servizio attivo. identifica una certa applicazione bluetooth
+    private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // è un identificativo del servizio attivo. identifica una certa applicazione bluetooth
     HolumApp g;                 //var globale                                                                            //come se fosse un numero di porta. sia il client che il server devono averlo uguale
 
     @Override
@@ -49,7 +49,7 @@ public class Connessione extends Activity{
         BTArrayAdapter = new ArrayAdapter<>(Connessione.this, android.R.layout.simple_list_item_1);
         elencoDiscover.setAdapter(BTArrayAdapter);
         elencoDiscover.setOnItemClickListener(listener);
-        g = (HolumApp)getApplication();   //classe var globale
+        g = (HolumApp) getApplication();   //classe var globale
 
 
         registerReceiver(ActionFoundReceiver,
@@ -57,7 +57,7 @@ public class Connessione extends Activity{
 
         if (BTAdapter == null) {
             //non esiste bluetooth
-            Toast.makeText(Connessione.this,"Non esiste il Bluetooth su questo dispositivo",  Toast.LENGTH_SHORT).show();
+            Toast.makeText(Connessione.this, "Non esiste il Bluetooth su questo dispositivo", Toast.LENGTH_SHORT).show();
             finish();
         }
         if (!BTAdapter.isEnabled()) {        //se non è attivo
@@ -145,37 +145,29 @@ public class Connessione extends Activity{
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
 
-            //connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));        //prende elemento cliccato e lo passa al metodo
-            ConnectThread connessione = new ConnectThread((BluetoothDevice) parent.getItemAtPosition(position), uuid);
-            connessione.start();
+            connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));        //prende elemento cliccato e lo passa al metodo
+
         }
     };
 
 
+    public void connectWithServer(BluetoothDevice device) {         //metodo per creare la connessione con il server
 
-
-
-    public void connectWithServer(BluetoothDevice device){         //metodo per creare la connessione con il server
-
-       /* BTAdapter.cancelDiscovery();       // selezionato il device dall'array, è necessario chiudere la discovery in quanto il device è già stato identificato
-        try{
+        BTAdapter.cancelDiscovery();       // selezionato il device dall'array, è necessario chiudere la discovery in quanto il device è già stato identificato
+        try {
 
             BTSocket = device.createRfcommSocketToServiceRecord(uuid);  //metodo che assegna a btsocket un canale con il quale comunicare con il servizio UUID
             g.setBTSocket(BTSocket);   //copia btsocket in var globale
             BTSocket.connect();          //blocking call che attende una connessione con il server .... (da mettere su thread)
-            if(BTSocket.isConnected()){    //appena riceve una connessione, visualizza messaggio
-                Toast.makeText(Connessione.this,"CONNESSO",  Toast.LENGTH_SHORT).show();
+            if (BTSocket.isConnected()) {    //appena riceve una connessione, visualizza messaggio
+                Toast.makeText(Connessione.this, "CONNESSO", Toast.LENGTH_SHORT).show();
 
             }
 
 
-        }catch(IOException e){
-            Toast.makeText(Connessione.this,"IOException",  Toast.LENGTH_SHORT).show();
-        }*/
-
-
-
-
+        } catch (IOException e) {
+            Toast.makeText(Connessione.this, "IOException", Toast.LENGTH_SHORT).show();
+        }
 
 
     }
