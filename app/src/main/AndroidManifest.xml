@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
-        android:name=".HolumApp"
+
         android:allowBackup="true"
         android:icon="@mipmap/pyramid2"
         android:label="@string/app_name"
@@ -40,6 +40,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".BluetoothService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

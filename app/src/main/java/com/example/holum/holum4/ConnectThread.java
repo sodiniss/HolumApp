@@ -8,11 +8,12 @@ import java.util.UUID;
 
 
 
+
 public class ConnectThread extends Thread {
-    private final BluetoothSocket mmSocket;
-    private final BluetoothDevice mmDevice;
+    private BluetoothSocket mmSocket;
+    private BluetoothDevice mmDevice;
     private final  BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    public DataThread dati;
+
 
     public ConnectThread(BluetoothDevice device) {
         BluetoothSocket tmp = null;
@@ -22,32 +23,35 @@ public class ConnectThread extends Thread {
             tmp = device.createRfcommSocketToServiceRecord(Connessione.uuid);
         } catch (IOException e) { }
         mmSocket = tmp;
+
     }
 
     public void run() {
-        // stop discovery
-        mBluetoothAdapter.cancelDiscovery();
 
         try {
             mmSocket.connect();
 
+
         } catch (IOException connectException) {
-            // ?? errore di connessione
+
             try {
                 mmSocket.close();
             } catch (IOException closeException) { }
-            return;
+
         }
 
-        // la connessione si gestisce in un altro thread
-       // dati = new DataThread(mmSocket);
-        //dati.start();
+
     }
 
-    /** Will cancel an in-progress connection, and close the socket */
+
     public void cancel() {
         try {
             mmSocket.close();
         } catch (IOException e) { }
     }
+
+    public BluetoothSocket getBTSocket() {
+        return mmSocket;
+    }
+
 }

@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.*;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,30 +20,31 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
 import java.util.UUID;
 
 
 public class Connessione extends Activity {
-    BluetoothAdapter BTAdapter; //identifica l'hardware bluetooth del dispositivo
-    public static int REQUEST_BLUETOOTH = 1; // richiesta per la startactivityforresult
-    ArrayAdapter<BluetoothDevice> BTArrayAdapter; //array di bluetoothdevice di tipo adapter ---> per listview
+
+    //grafica
+    Button button; // bottone annulla o inizia ricerca
     TextView text;
     ListView elencoDiscover; // dove vengono elencati i dispositivi nelle vicinanze
-    Button button; // bottone annulla o inizia ricerca
+    ArrayAdapter<String> BTArrayAdapter; //array di string ---> per listview
+    //bt
+    BluetoothAdapter BTAdapter; //identifica l'hardware bluetooth del dispositivo
     BluetoothDevice device; //identifica il dispositivo con bluetooth attivo
-    BluetoothSocket BTSocket; // è il socket con il quale il bluetoothdevice si connette a un altro device
+    //static
     public static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"); // è un identificativo del servizio attivo. identifica una certa applicazione bluetooth
-    HolumApp g;                 //var globale                                                                            //come se fosse un numero di porta. sia il client che il server devono averlo uguale
+    public static int REQUEST_BLUETOOTH = 1; // richiesta per la startactivityforresult
+    //service binding
+    BluetoothService bts;
+    boolean mBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connessione);
+        //definizioni
         elencoDiscover = (ListView) findViewById(R.id.l_discover);
         text = (TextView) findViewById(R.id.t_c_1);
         button = (Button) findViewById(R.id.b_c_1);
@@ -49,34 +52,35 @@ public class Connessione extends Activity {
         BTArrayAdapter = new ArrayAdapter<>(Connessione.this, android.R.layout.simple_list_item_1);
         elencoDiscover.setAdapter(BTArrayAdapter);
         elencoDiscover.setOnItemClickListener(listener);
-        g = (HolumApp) getApplication();   //classe var globale
-
-
         registerReceiver(ActionFoundReceiver,
                 new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
+
+        hideUI();
+        checkBluetooth(BTAdapter);
+
+
+    }
+
+    public void checkBluetooth(BluetoothAdapter BTAdapter){
         if (BTAdapter == null) {
             //non esiste bluetooth
             Toast.makeText(Connessione.this, "Non esiste il Bluetooth su questo dispositivo", Toast.LENGTH_SHORT).show();
             finish();
         }
         if (!BTAdapter.isEnabled()) {        //se non è attivo
-            //nascondi la ui
-            button.setVisibility(View.INVISIBLE);
-            text.setVisibility(View.INVISIBLE);
-            elencoDiscover.setVisibility(View.INVISIBLE);
+
             //richiedi permessi per accenderlo
             Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBT, REQUEST_BLUETOOTH); //inizia activity e attendi un result ---> onActivityResult
         } else {
             // se bt attivo allora inizia subito la ricerca
+            displayUI();
             BTAdapter.startDiscovery();
         }
-
-
     }
 
-    public void gestisciRicerca(View v) {
+    public void bottoneRicerca(View v) {
 
         if (BTAdapter.isDiscovering()) {   // al click stoppa discovery
             BTAdapter.cancelDiscovery();
@@ -93,6 +97,11 @@ public class Connessione extends Activity {
         button.setVisibility(View.VISIBLE);
         text.setVisibility(View.VISIBLE);
         elencoDiscover.setVisibility(View.VISIBLE);
+    }
+    public void hideUI(){
+        button.setVisibility(View.INVISIBLE);
+        text.setVisibility(View.INVISIBLE);
+        elencoDiscover.setVisibility(View.INVISIBLE);
     }
 
 
@@ -134,7 +143,7 @@ public class Connessione extends Activity {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                BTArrayAdapter.add(device);
+                BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 BTArrayAdapter.notifyDataSetChanged();
             }
         }
@@ -145,32 +154,17 @@ public class Connessione extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
 
-            connectWithServer((BluetoothDevice) parent.getItemAtPosition(position));        //prende elemento cliccato e lo passa al metodo
+
+            String address = (String)parent.getItemAtPosition(position);                //salva string da arrayadapter
+            address = address.substring(address.length() - 17);                           //salva solamente il mac address
+            device = BTAdapter.getRemoteDevice(address);                                //seleziona device con quell'address
+            BTAdapter.cancelDiscovery();
+            startService(new Intent(Connessione.this,BluetoothService.class));
+            bts.connectionSetup(device);
+
 
         }
     };
-
-
-    public void connectWithServer(BluetoothDevice device) {         //metodo per creare la connessione con il server
-
-        BTAdapter.cancelDiscovery();       // selezionato il device dall'array, è necessario chiudere la discovery in quanto il device è già stato identificato
-        try {
-
-            BTSocket = device.createRfcommSocketToServiceRecord(uuid);  //metodo che assegna a btsocket un canale con il quale comunicare con il servizio UUID
-            g.setBTSocket(BTSocket);   //copia btsocket in var globale
-            BTSocket.connect();          //blocking call che attende una connessione con il server .... (da mettere su thread)
-            if (BTSocket.isConnected()) {    //appena riceve una connessione, visualizza messaggio
-                Toast.makeText(Connessione.this, "CONNESSO", Toast.LENGTH_SHORT).show();
-
-            }
-
-
-        } catch (IOException e) {
-            Toast.makeText(Connessione.this, "IOException", Toast.LENGTH_SHORT).show();
-        }
-
-
-    }
 
 
     @Override
@@ -179,4 +173,39 @@ public class Connessione extends Activity {
         super.onDestroy();
         unregisterReceiver(ActionFoundReceiver);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, BluetoothService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+
+            BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
+            bts = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 }
