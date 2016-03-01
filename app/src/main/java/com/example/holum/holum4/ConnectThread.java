@@ -19,8 +19,11 @@ public class ConnectThread extends Thread {
         BluetoothSocket tmp = null;
         mmDevice = device;
 
+
         try {
             tmp = device.createRfcommSocketToServiceRecord(Connessione.uuid);
+            //STATE_CONNECTED
+
         } catch (IOException e) { }
         mmSocket = tmp;
 
@@ -29,6 +32,7 @@ public class ConnectThread extends Thread {
     public void run() {
 
         try {
+
             mmSocket.connect();
 
 

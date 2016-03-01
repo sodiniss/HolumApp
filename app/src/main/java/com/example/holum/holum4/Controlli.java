@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,39 +19,63 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class Controlli extends Activity {
-    TextView t;
+
     int message;
     BluetoothService bts;
     boolean mBound = false;
-
+    Touchpad tp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_controlli);
-        t = (TextView)findViewById(R.id.t_prova);
+        setContentView(R.layout.activity_controlli2);
+        tp = (Touchpad)findViewById(R.id.t_pad);
+
+        tp.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(tp.getMessage()){
+
+                    case 2:
+                        Up();
+                        break;
+                    case 1:
+                        Left();
+                        break;
+                    case 4:
+                        Down();
+                        break;
+                    case 3:
+                        Right();
+                        break;
+                }
+                return false;
+            }
+        });
+
+
 
     }
 
 
     //metodi onclick dei bottoni
     //passano alla funzione writeint il valore che identifica la direzione (specificata nel server)
-    public void Left(View v) {
+    public void Left() {
         message = 1;
         bts.write(message);
     }
-    public void Up(View v) {
+    public void Up() {
         message = 2;
         bts.write(message);
     }
-    public void Right(View v) {
+    public void Right() {
         message = 3;
         bts.write(message);
     }
-    public void Down(View v) {
+    public void Down() {
         message = 4;
         bts.write(message);
     }
-    public void Enter(View v) {
+    public void Enter() {
         message = 5;
         bts.write(message);
     }

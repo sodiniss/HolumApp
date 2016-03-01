@@ -16,7 +16,8 @@
         android:rowCount="5"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="200px">
+        android:layout_marginBottom="200px"
+        android:id="@+id/gridLayout">
 
         <Button
             android:layout_width="200px"
@@ -65,11 +66,7 @@
             android:onClick="Right"/>
     </GridLayout>
 
-    <TextView
-        android:layout_width="800px"
-        android:layout_height="200px"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/t_prova"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+
+
+
 </RelativeLayout>

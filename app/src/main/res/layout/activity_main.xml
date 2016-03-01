@@ -7,25 +7,62 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.holum.holum4.MainActivity">
+    tools:context="com.example.holum.holum4.MainActivity"
+    android:background="@drawable/splashback">
 
     <Button
-        android:layout_width="800px"
-        android:layout_height="200px"
-        android:text="CONNESSIONE"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="Connessione"
         android:id="@+id/b_connessione"
-        android:layout_marginTop="150px"
-        android:layout_centerHorizontal="true"
-        android:onClick="LaunchConnessione" />
-
-
+        android:onClick="LaunchConnessione"
+        android:background="#1565c0"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp"
+        android:textAllCaps="false"
+        android:layout_marginBottom="62dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
     <Button
-        android:layout_width="800px"
-        android:layout_height="200px"
-        android:text="CONTROLLI"
+        android:layout_width="200dp"
+        android:layout_height="60dp"
+        android:text="Controlli"
         android:id="@+id/b_controlli"
-        android:layout_marginTop="500px"
+        android:onClick="LaunchControlli"
+        android:background="#1565c0"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp"
+        android:textAllCaps="false"
+        android:layout_marginBottom="62dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="LaunchControlli" />
+        />
+
+    <TextView
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:text="HOLUM"
+        android:id="@+id/t_holum"
+        android:layout_marginTop="76dp"
+        android:textSize="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:text="APP"
+        android:id="@+id/t_app"
+        android:layout_below="@+id/t_holum"
+        android:layout_alignEnd="@+id/b_connessione"
+        android:layout_alignStart="@+id/b_connessione"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textStyle="italic"
+        android:textSize="28sp" />
+
 
 </RelativeLayout>

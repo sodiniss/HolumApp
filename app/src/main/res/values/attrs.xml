@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Touchpad">
+        <attr name="padColor" format="color"></attr>
+        <attr name="padWidth" format="dimension"></attr>
+        <attr name="padHeight" format="dimension"></attr>
+    </declare-styleable>
+</resources>

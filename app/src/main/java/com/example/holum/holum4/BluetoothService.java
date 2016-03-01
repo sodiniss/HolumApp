@@ -1,7 +1,9 @@
 package com.example.holum.holum4;
 
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Binder;
@@ -21,11 +23,21 @@ public class BluetoothService extends Service {
     ConnectThread ct;
     BluetoothDevice device;
     BluetoothSocket BTSocket;
+
     private final IBinder mBinder = new LocalBinder();
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Bundle b = intent.getExtras();
+        device = b.getParcelable("myBTdevice");
+        connectionSetup(device);
+
+
+        Toast.makeText(this,"CONNESSOOOOOO"+BluetoothAdapter.getDefaultAdapter().,Toast.LENGTH_SHORT).show();
+
+
+
         return START_STICKY;
     }
 
@@ -61,9 +73,11 @@ public class BluetoothService extends Service {
         t1.start();
         try {
             t1.join();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
     }
 
     public void streamSetup(){
@@ -82,5 +96,10 @@ public class BluetoothService extends Service {
     public void closeConnect(){
         ct.cancel();
     }
+
+
+    public void stateOn(){}
+    public void stateOff(){}
+    public void stateConnected(){}
 }
 

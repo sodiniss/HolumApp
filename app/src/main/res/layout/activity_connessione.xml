@@ -7,34 +7,45 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.holum.holum4.Connessione">
+    tools:context="com.example.holum.holum4.Connessione"
+    android:background="#231a3f">
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="150px"
+        android:layout_height="40dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Dispositivi nelle vicinanze"
         android:id="@+id/t_c_1"
+        android:textSize="25dp"
+        android:textColor="#FFFFFF"
         android:layout_alignParentTop="true"
-        android:textSize="25dp" />
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center" />
 
     <ListView
-        android:layout_width="800px"
-        android:layout_height="1000px"
+        android:layout_width="wrap_content"
+        android:layout_height="360dp"
         android:id="@+id/l_discover"
+        android:background="#FFFFFF"
+        android:choiceMode="singleChoice"
+        android:textAlignment="center"
+        android:textFilterEnabled="false"
+        android:smoothScrollbar="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:background="@android:color/holo_blue_dark"
-        android:choiceMode="singleChoice" />
+        android:layout_alignStart="@+id/b_c_1"
+        android:layout_alignEnd="@+id/b_c_1" />
 
     <Button
-        android:layout_width="800px"
-        android:layout_height="150px"
-        android:text="ANNULLA RICERCA"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
         android:id="@+id/b_c_1"
+        android:onClick="bottoneRicerca"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="bottoneRicerca"/>
+        android:background="#1565c0"
+        android:textColor="#FFFFFF"
+        android:text="Annulla scansione"
+        android:layout_alignStart="@+id/t_c_1"
+        android:layout_alignEnd="@+id/t_c_1" />
 
 
 

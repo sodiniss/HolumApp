@@ -38,6 +38,7 @@ public class Connessione extends Activity {
     public static int REQUEST_BLUETOOTH = 1; // richiesta per la startactivityforresult
     //service binding
     BluetoothService bts;
+    BluetoothStateListener bsl;
     boolean mBound;
 
     @Override
@@ -55,40 +56,57 @@ public class Connessione extends Activity {
         registerReceiver(ActionFoundReceiver,
                 new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
-
         hideUI();
-        checkBluetooth(BTAdapter);
 
 
     }
 
-    public void checkBluetooth(BluetoothAdapter BTAdapter){
-        if (BTAdapter == null) {
-            //non esiste bluetooth
-            Toast.makeText(Connessione.this, "Non esiste il Bluetooth su questo dispositivo", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        if (!BTAdapter.isEnabled()) {        //se non è attivo
 
-            //richiedi permessi per accenderlo
-            Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBT, REQUEST_BLUETOOTH); //inizia activity e attendi un result ---> onActivityResult
-        } else {
-            // se bt attivo allora inizia subito la ricerca
-            displayUI();
-            BTAdapter.startDiscovery();
-        }
+    public void alertRequest(){
+        new AlertDialog.Builder(Connessione.this)    //allora crea dialogbox
+                .setTitle("Avviso")
+                .setMessage("L'applicazione richiede i permessi per l'utilizzo del Bluetooth")
+                .setCancelable(false)
+                .setPositiveButton("Concedi", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        BTAdapter.enable();
+                        BTAdapter.startDiscovery();
+                        displayUI();
+                    }
+
+                })
+                .setNegativeButton("Nega", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        new AlertDialog.Builder(Connessione.this)    //allora crea dialogbox
+                                .setTitle("Avviso")
+                                .setMessage("Bluetooth negato.Vuoi uscire?")
+                                .setCancelable(false)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        alertRequest();
+                                    }
+                                })
+
+                                .show();
+                    }
+                })
+
+                .show();
     }
-
     public void bottoneRicerca(View v) {
 
         if (BTAdapter.isDiscovering()) {   // al click stoppa discovery
             BTAdapter.cancelDiscovery();
-            button.setText("INIZIA RICERCA");
+            button.setText("Inizia scansione");
         } else { //al click inizia discovery
             BTArrayAdapter.clear();
             BTAdapter.startDiscovery();
-            button.setText("ANNULLA RICERCA");
+            button.setText("Annulla scansione");
         }
 
     }
@@ -105,35 +123,7 @@ public class Connessione extends Activity {
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {  //metodo autogenerato per gestire il risultato della startactivityforresult
-        if (requestCode == REQUEST_BLUETOOTH) {    // controlla il tipo di richiesta
-            if (resultCode != RESULT_OK) {       // se bluetooth non concesso
-                //richiesta rifiutata
-                new AlertDialog.Builder(this)    //allora crea dialogbox
-                        .setTitle("Avviso")
-                        .setMessage("Bluetooth negato.Vuoi uscire?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                                startActivityForResult(enableBT, REQUEST_BLUETOOTH);
-                            }
-                        })
 
-                        .show();
-
-            } else {        //se concesso bt
-                displayUI();
-                BTArrayAdapter.clear();  // funzione per svuotare l'array
-                BTAdapter.startDiscovery(); // inizia la ricerca
-            }
-        }
-    }
 
     private final BroadcastReceiver ActionFoundReceiver = new BroadcastReceiver() {
 
@@ -159,8 +149,13 @@ public class Connessione extends Activity {
             address = address.substring(address.length() - 17);                           //salva solamente il mac address
             device = BTAdapter.getRemoteDevice(address);                                //seleziona device con quell'address
             BTAdapter.cancelDiscovery();
-            startService(new Intent(Connessione.this,BluetoothService.class));
-            bts.connectionSetup(device);
+            Bundle b = new Bundle();
+            b.putParcelable("myBTdevice", device);
+            Intent intent =  new Intent(Connessione.this, BluetoothService.class);
+            intent.putExtras(b);
+            startService(intent);
+
+
 
 
         }
@@ -190,7 +185,19 @@ public class Connessione extends Activity {
             mBound = false;
         }
     }
+    @Override
+    protected void onResume() {
+        bsl = new BluetoothStateListener();
+        bsl.checkState(this);
+        registerReceiver(bsl, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        super.onResume();
+    }
 
+    @Override
+    protected void onPause() {
+        unregisterReceiver(bsl);
+        super.onPause();
+    }
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -208,4 +215,15 @@ public class Connessione extends Activity {
             mBound = false;
         }
     };
+
+
+    public void stateOn(){
+        displayUI();
+    }
+    public void stateOff(){
+        alertRequest();
+    }
+    public void stateConnected(){
+        startActivity(new Intent("com.example.holum.holum4.Controlli"));
+    }
 }
