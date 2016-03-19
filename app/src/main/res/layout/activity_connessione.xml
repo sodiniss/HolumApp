@@ -32,20 +32,32 @@
         android:textFilterEnabled="false"
         android:smoothScrollbar="true"
         android:layout_centerVertical="true"
-        android:layout_alignStart="@+id/b_c_1"
-        android:layout_alignEnd="@+id/b_c_1" />
+        android:layout_alignStart="@+id/b_annullaScansione"
+        android:layout_alignEnd="@+id/b_annullaScansione" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:id="@+id/b_c_1"
-        android:onClick="bottoneRicerca"
+        android:id="@+id/b_annullaScansione"
+        android:onClick="annullaScansione"
         android:layout_alignParentBottom="true"
         android:background="#1565c0"
         android:textColor="#FFFFFF"
         android:text="Annulla scansione"
         android:layout_alignStart="@+id/t_c_1"
         android:layout_alignEnd="@+id/t_c_1" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:id="@+id/b_iniziaScansione"
+        android:onClick="iniziaScansione"
+        android:layout_alignParentBottom="true"
+        android:background="#1565c0"
+        android:textColor="#FFFFFF"
+        android:text="Inizia scansione"
+        android:layout_alignStart="@+id/t_c_1"
+        android:layout_alignEnd="@+id/t_c_1"
+        android:visibility="invisible"/>
 
 
 

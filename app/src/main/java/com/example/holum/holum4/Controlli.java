@@ -122,5 +122,9 @@ public class Controlli extends Activity {
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this,MainActivity.class));
 
+    }
 }

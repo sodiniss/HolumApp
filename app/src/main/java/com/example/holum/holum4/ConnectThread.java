@@ -1,7 +1,14 @@
 package com.example.holum.holum4;
 
 import android.bluetooth.*;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 import java.io.*;
 import java.util.UUID;
@@ -12,28 +19,32 @@ import java.util.UUID;
 public class ConnectThread extends Thread {
     private BluetoothSocket mmSocket;
     private BluetoothDevice mmDevice;
-    private final  BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private Context secondContext;
 
 
-    public ConnectThread(BluetoothDevice device) {
+
+    public ConnectThread(BluetoothDevice device,Context context) {
         BluetoothSocket tmp = null;
         mmDevice = device;
-
-
+        secondContext = context;
         try {
             tmp = device.createRfcommSocketToServiceRecord(Connessione.uuid);
-            //STATE_CONNECTED
+
+
 
         } catch (IOException e) { }
         mmSocket = tmp;
 
     }
 
+
     public void run() {
 
         try {
 
             mmSocket.connect();
+
+
 
 
         } catch (IOException connectException) {
@@ -47,7 +58,6 @@ public class ConnectThread extends Thread {
 
     }
 
-
     public void cancel() {
         try {
             mmSocket.close();
@@ -57,5 +67,7 @@ public class ConnectThread extends Thread {
     public BluetoothSocket getBTSocket() {
         return mmSocket;
     }
+
+
 
 }

@@ -16,7 +16,8 @@
         android:id="@+id/t_pad"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:background="#3949ab" />
+        android:background="#3949ab"
+        />
 
 
 

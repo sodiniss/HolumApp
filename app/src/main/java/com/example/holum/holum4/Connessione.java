@@ -19,14 +19,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Toast;
+
+import java.io.IOException;
 import java.util.UUID;
 
 
 public class Connessione extends Activity {
 
     //grafica
-    Button button; // bottone annulla o inizia ricerca
+    Button b_annullaScansione,b_iniziaScansione; // bottone annulla o inizia ricerca
     TextView text;
     ListView elencoDiscover; // dove vengono elencati i dispositivi nelle vicinanze
     ArrayAdapter<String> BTArrayAdapter; //array di string ---> per listview
@@ -38,8 +39,15 @@ public class Connessione extends Activity {
     public static int REQUEST_BLUETOOTH = 1; // richiesta per la startactivityforresult
     //service binding
     BluetoothService bts;
-    BluetoothStateListener bsl;
-    boolean mBound;
+
+    BluetoothSocket tmp, socket;
+    boolean mBound = false;
+    IntentFilter state = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+    IntentFilter extrastate = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+    IntentFilter discoveringstate = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+    IntentFilter notdiscoveringstate = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+    IntentFilter connected = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+    IntentFilter disconnected = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,29 +56,35 @@ public class Connessione extends Activity {
         //definizioni
         elencoDiscover = (ListView) findViewById(R.id.l_discover);
         text = (TextView) findViewById(R.id.t_c_1);
-        button = (Button) findViewById(R.id.b_c_1);
+        b_annullaScansione = (Button) findViewById(R.id.b_annullaScansione);
+        b_iniziaScansione = (Button) findViewById(R.id.b_iniziaScansione);
         BTAdapter = BluetoothAdapter.getDefaultAdapter();  //funzione che restituisce l'adapter del dispositivo
         BTArrayAdapter = new ArrayAdapter<>(Connessione.this, android.R.layout.simple_list_item_1);
         elencoDiscover.setAdapter(BTArrayAdapter);
         elencoDiscover.setOnItemClickListener(listener);
         registerReceiver(ActionFoundReceiver,
                 new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        registerReceiver(isDiscoveringReceiver,
+                new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
+        registerReceiver(isNotDiscoveringReceiver,
+                new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
 
-        hideUI();
 
 
     }
 
 
     public void alertRequest(){
+        hideUI();
         new AlertDialog.Builder(Connessione.this)    //allora crea dialogbox
                 .setTitle("Avviso")
                 .setMessage("L'applicazione richiede i permessi per l'utilizzo del Bluetooth")
                 .setCancelable(false)
                 .setPositiveButton("Concedi", new DialogInterface.OnClickListener() {
+
                     public void onClick(DialogInterface dialog, int which) {
                         BTAdapter.enable();
-                        BTAdapter.startDiscovery();
+
                         displayUI();
                     }
 
@@ -98,26 +112,34 @@ public class Connessione extends Activity {
 
                 .show();
     }
-    public void bottoneRicerca(View v) {
+    public void iniziaScansione(View v) {
 
-        if (BTAdapter.isDiscovering()) {   // al click stoppa discovery
-            BTAdapter.cancelDiscovery();
-            button.setText("Inizia scansione");
-        } else { //al click inizia discovery
-            BTArrayAdapter.clear();
-            BTAdapter.startDiscovery();
-            button.setText("Annulla scansione");
-        }
+        BTAdapter.startDiscovery();
 
+    }
+    public void annullaScansione(View v){
+
+        BTAdapter.cancelDiscovery();
     }
 
     public void displayUI() {
-        button.setVisibility(View.VISIBLE);
+        if(BTAdapter.isEnabled()){
+            BTAdapter.startDiscovery();
+        }
+        if(BTAdapter.isDiscovering()){
+            b_annullaScansione.setVisibility(View.VISIBLE);
+            b_iniziaScansione.setVisibility(View.INVISIBLE);
+        }else{
+            b_iniziaScansione.setVisibility(View.VISIBLE);
+            b_annullaScansione.setVisibility(View.INVISIBLE);
+        }
         text.setVisibility(View.VISIBLE);
         elencoDiscover.setVisibility(View.VISIBLE);
+        ;
     }
     public void hideUI(){
-        button.setVisibility(View.INVISIBLE);
+        b_iniziaScansione.setVisibility(View.INVISIBLE);
+        b_annullaScansione.setVisibility(View.INVISIBLE);
         text.setVisibility(View.INVISIBLE);
         elencoDiscover.setVisibility(View.INVISIBLE);
     }
@@ -138,7 +160,35 @@ public class Connessione extends Activity {
             }
         }
     };
+    private final BroadcastReceiver isDiscoveringReceiver = new BroadcastReceiver() {
 
+        @Override
+        public void onReceive(Context context, Intent intent) {       //metodo brutto che aggiunge i dispositivi trovati all'array e gli visualizza
+            // TODO Auto-generated method stub
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+                BTArrayAdapter.clear();
+
+                    b_annullaScansione.setVisibility(View.VISIBLE);
+                    b_iniziaScansione.setVisibility(View.INVISIBLE);
+
+
+            }
+        }
+    };
+    private final BroadcastReceiver isNotDiscoveringReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {       //metodo brutto che aggiunge i dispositivi trovati all'array e gli visualizza
+            // TODO Auto-generated method stub
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+
+                b_iniziaScansione.setVisibility(View.VISIBLE);
+                b_annullaScansione.setVisibility(View.INVISIBLE);
+            }
+        }
+    };
 
     OnItemClickListener listener = new OnItemClickListener() {    //metodo della listview che permette di gestire il click su un elemento dell'array
         public void onItemClick(AdapterView<?> parent, View view, int position,
@@ -149,11 +199,12 @@ public class Connessione extends Activity {
             address = address.substring(address.length() - 17);                           //salva solamente il mac address
             device = BTAdapter.getRemoteDevice(address);                                //seleziona device con quell'address
             BTAdapter.cancelDiscovery();
-            Bundle b = new Bundle();
+            /*Bundle b = new Bundle();
             b.putParcelable("myBTdevice", device);
             Intent intent =  new Intent(Connessione.this, BluetoothService.class);
             intent.putExtras(b);
-            startService(intent);
+            startService(intent);*/
+            bts.setNewDevice(device);
 
 
 
@@ -166,7 +217,11 @@ public class Connessione extends Activity {
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
+        BTArrayAdapter.clear();
         unregisterReceiver(ActionFoundReceiver);
+        unregisterReceiver(isDiscoveringReceiver);
+        unregisterReceiver(isNotDiscoveringReceiver);
+
     }
 
     @Override
@@ -174,6 +229,7 @@ public class Connessione extends Activity {
         super.onStart();
         Intent intent = new Intent(this, BluetoothService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
 
     }
     @Override
@@ -187,15 +243,22 @@ public class Connessione extends Activity {
     }
     @Override
     protected void onResume() {
-        bsl = new BluetoothStateListener();
-        bsl.checkState(this);
-        registerReceiver(bsl, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        if(mBound){
+            bts.getBSL().checkState(Connessione.this);
+            registerReceiver(bts.getBSL(), state);
+            registerReceiver(bts.getBSL(), connected);
+            registerReceiver(bts.getBSL(), disconnected);
+        }
+        //registerReceiver(bsl, discoveringstate);
+       // registerReceiver(bsl, notdiscoveringstate);
+
+
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        unregisterReceiver(bsl);
+        unregisterReceiver(bts.getBSL());
         super.onPause();
     }
 
@@ -208,6 +271,10 @@ public class Connessione extends Activity {
             BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
             bts = binder.getService();
             mBound = true;
+            bts.getBSL().checkState(Connessione.this);
+            registerReceiver(bts.getBSL(), state);
+            registerReceiver(bts.getBSL(), connected);
+            registerReceiver(bts.getBSL(), disconnected);
         }
 
         @Override
@@ -217,11 +284,13 @@ public class Connessione extends Activity {
     };
 
 
-    public void stateOn(){
-        displayUI();
-    }
+
     public void stateOff(){
         alertRequest();
+
+    }
+    public void stateOn(){
+        displayUI();
     }
     public void stateConnected(){
         startActivity(new Intent("com.example.holum.holum4.Controlli"));
