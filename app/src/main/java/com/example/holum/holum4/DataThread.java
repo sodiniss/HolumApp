@@ -4,11 +4,12 @@ import android.bluetooth.*;
 import java.io.*;
 
 
-public class DataThread implements Runnable {
-    private final BluetoothSocket mmSocket;
-    private final OutputStream mmOutStream;
+public class DataThread extends Thread {
+    private  BluetoothSocket mmSocket;
+    private  OutputStream mmOutStream;
 
     public DataThread(BluetoothSocket socket) {
+
         mmSocket = socket;
         OutputStream tmpOut = null;
 
@@ -25,11 +26,26 @@ public class DataThread implements Runnable {
 
     }
 
+    private void resetConnection() {
 
+
+        if (mmOutStream != null) {
+            try {mmOutStream.close();} catch (Exception e) {}
+            mmOutStream = null;
+        }
+
+        if (mmSocket != null) {
+            try {mmSocket.close();} catch (Exception e) {}
+            mmSocket = null;
+        }
+
+    }
     public void writeInt(int i){
         try {
+
             mmOutStream.write(i);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+        }
 
     }
     // da chiamare per chiudere la connessione

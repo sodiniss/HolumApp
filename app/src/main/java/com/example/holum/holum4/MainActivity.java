@@ -21,19 +21,22 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
     BluetoothService bts;
-    Button b_connessione,b_controlli;
+    Button b_connessione,b_controlli, b_disconnetti;
     boolean mBound = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         startService(new Intent(MainActivity.this, BluetoothService.class));
+
         //UI
         TextView t = (TextView)findViewById(R.id.t_holum);
         Typeface font = Typeface.createFromAsset(this.getAssets(), "fonts/msyi.ttf");
-        t.setTypeface(font);
+        //t.setTypeface(font);
         b_connessione = (Button)findViewById(R.id.b_connessione);
         b_controlli = (Button)findViewById(R.id.b_controlli);
+        b_disconnetti= (Button)findViewById(R.id.b_disconnetti);
 
 
 
@@ -47,15 +50,21 @@ public class MainActivity extends Activity {
         startActivity(new Intent("com.example.holum.holum4.Controlli"));
     }
 
+    public void LaunchDisconnetti(View v){
+        bts.disconnect();
+    }
+
     //Metodi Listener
     public void stateConnected(){
         b_connessione.setVisibility(View.INVISIBLE);
         b_controlli.setVisibility(View.VISIBLE);
+        b_disconnetti.setVisibility(View.VISIBLE);
 
     }
     public void stateDisconnected(){
         b_controlli.setVisibility(View.INVISIBLE);
         b_connessione.setVisibility(View.VISIBLE);
+        b_disconnetti.setVisibility(View.INVISIBLE);
 
     }
     //Metodi della activity
@@ -95,8 +104,17 @@ public class MainActivity extends Activity {
     }
     @Override
     public void onBackPressed() {
-        BluetoothAdapter.getDefaultAdapter().disable();
+        //BluetoothAdapter.getDefaultAdapter().disable();
         stopService(new Intent(MainActivity.this, BluetoothService.class));
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        try {
+            new Thread().sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.exit(0);
 
     }

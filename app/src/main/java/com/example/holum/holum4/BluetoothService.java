@@ -28,10 +28,12 @@ import android.widget.Toast;
 public class BluetoothService extends Service {
     DataThread dt;
     ConnectThread ct;
+    Thread t2;
     BluetoothStateListener bsl;
     BluetoothDevice device;
     BluetoothSocket BTSocket;
-
+    BluetoothAdapter BTAdapter;
+    int loop =0;
     private final IBinder mBinder = new LocalBinder();
 
 
@@ -42,14 +44,22 @@ public class BluetoothService extends Service {
         connectionSetup(device);*/
         //Toast.makeText(BluetoothService.this,"STARTED", Toast.LENGTH_SHORT).show();
         bsl = new BluetoothStateListener();
+        BTAdapter = BluetoothAdapter.getDefaultAdapter();
         return START_STICKY;
     }
     public void setNewDevice(BluetoothDevice selectedDevice){
+
         device = selectedDevice;
         connectionSetup(device);
 
     }
+    public void disconnect(){
+        if(BTAdapter.isEnabled()){
+            BTAdapter.disable();
+            BTAdapter.enable();
+        }
 
+    }
 
     public BluetoothStateListener getBSL(){
         return this.bsl;
@@ -85,23 +95,11 @@ public class BluetoothService extends Service {
     //funzioni del service
 
     public void connectionSetup(BluetoothDevice device){
-        /*
-        ct = new ConnectThread("ConnectThread");
-        ct.setConnectThread(device);
-        ct.start();
-        Looper looper = ct.getLooper();
-        handler = new Handler(looper);
-        registerReceiver (connectionReceiver,  new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED), null, handler);
-        try {
-            ct.join();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
 
         ct = new ConnectThread(device,this);
         Thread t1 = new Thread(ct);
         t1.start();
+
         try {
             t1.join();
         } catch (InterruptedException e) {
@@ -113,11 +111,17 @@ public class BluetoothService extends Service {
     public void streamSetup(){
         if(ct.getBTSocket().isConnected()){
             dt = new DataThread(ct.getBTSocket());
-            new Thread(dt).start();
+            t2 = new Thread(dt);
+            t2.start();
         }
 
     }
     public void write(int message){
+        try {
+            t2.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         dt.writeInt(message);
     }
     public void closeStream(){

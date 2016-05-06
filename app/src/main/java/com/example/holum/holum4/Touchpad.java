@@ -17,10 +17,10 @@ public class Touchpad extends View {
     TypedArray values;
     int padColor;
     Float padWidth, padHeight;
-    GestureDetector gt;
     int message = 0;
     float currentX;
     float currentY;
+
     public Touchpad(Context context, AttributeSet attrs) {
         super(context, attrs);
         paintColor = new Paint();
@@ -32,28 +32,11 @@ public class Touchpad extends View {
         } finally {
             values.recycle();
         }
-        gt = new GestureDetector(getContext(),new OnSwipeListener() {
-            public boolean onSwipe(Direction direction) {
-                switch(direction){
-                    case up:
-                        message = 2;
-                        break;
-                    case down:
-                        message = 4;
-                        break;
-                    case left:
-                        message = 1;
-                        break;
-                    case right:
-                        message = 3;
-                        break;
-                }
-                return super.onSwipe(direction);
-            }
 
-        });
+
 
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -63,29 +46,8 @@ public class Touchpad extends View {
         canvas.drawRect(padHeight, padWidth, padHeight, padWidth, paintColor);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        gt.onTouchEvent(event);
-        //setCurrentX(event.getX());
-        //setCurrentY(event.getY());
-        return true;
-        // MainActivity.t.setText("X = "+(int)getCurrentX()+"\nY = "+(int)getCurrentY());
 
 
-
-    }
-    public void setCurrentX(float x){
-        currentX = x;
-    }
-    public float getCurrentX(){
-        return currentX;
-    }
-    public void setCurrentY(float y){
-        currentY = y;
-    }
-    public float getCurrentY(){
-        return currentY;
-    }
 
     public int getMessage(){
         return message;

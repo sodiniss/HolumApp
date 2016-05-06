@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" android:launchMode="singleInstance">
+        <activity android:name=".MainActivity" android:launchMode="singleInstance" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,13 +20,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Connessione">
+        <activity android:name=".Connessione" android:launchMode="singleInstance" android:screenOrientation="portrait">
                         <intent-filter>
                             <action android:name="com.example.holum.holum4.Connessione" />
                             <category android:name="android.intent.category.DEFAULT" />
                         </intent-filter>
         </activity>
-        <activity android:name=".Controlli" android:launchMode="singleInstance">
+        <activity android:name=".Controlli" android:launchMode="singleInstance" android:screenOrientation="portrait">
                   <intent-filter>
                         <action android:name="com.example.holum.holum4.Controlli" />
                        <category android:name="android.intent.category.DEFAULT" />
