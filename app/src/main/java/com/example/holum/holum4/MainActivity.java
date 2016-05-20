@@ -53,7 +53,9 @@ public class MainActivity extends Activity {
     public void LaunchDisconnetti(View v){
         bts.disconnect();
     }
-
+    public void test(View v){
+        startActivity(new Intent("com.example.holum.holum4.ControlliTest"));
+    }
     //Metodi Listener
     public void stateConnected(){
         b_connessione.setVisibility(View.INVISIBLE);

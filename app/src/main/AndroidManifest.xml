@@ -32,7 +32,12 @@
                        <category android:name="android.intent.category.DEFAULT" />
                   </intent-filter>
         </activity>
-
+        <activity android:name=".ControlliTest" android:launchMode="singleInstance" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.example.holum.holum4.ControlliTest" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <service android:name=".BluetoothService"
             android:exported="false"></service>
     </application>

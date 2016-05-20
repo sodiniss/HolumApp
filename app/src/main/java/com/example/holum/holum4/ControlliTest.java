@@ -1,47 +1,36 @@
 package com.example.holum.holum4;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-public class Controlli extends Activity {
+public class ControlliTest extends Activity {
 
     int message;
-    BluetoothService bts;
     boolean mBound = false;
     Touchpad tp;
+    static TextView t;
     GestureDetector gt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_controlli2);
-
+        setContentView(R.layout.activity_controlli2test);
+        t = (TextView)findViewById(R.id.display);
         tp = (Touchpad)findViewById(R.id.t_pad);
         gt = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                message = 5;
-                bts.write(message);
+                t.append("ciao");
                 return true;
             }
         });
+
+
+
         tp.setOnTouchListener(new OnSwipeListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -130,33 +119,61 @@ public class Controlli extends Activity {
             }
             public void onUpSwipe(float value) {
                 message = 2;
-                bts.write(message);
+                t.append("UP" + "\n");
 
             }
 
             public void onDownSwipe(float value) {
 
                 message = 4;
-                bts.write(message);
+                t.append("DOWN" + "\n");
             }
 
             public void onRightSwipe(float value) {
                 message = 3;
-                bts.write(message);
+                t.append("RIGHT" + "\n");
             }
 
             public void onLeftSwipe(float value) {
                 message = 1;
-                bts.write(message);
+                t.append("LEFT" + "\n");
             }
         });
 
 
 
+
+        /*
+        tp.setOnTouchListener(new OnSwipeListener() {
+
+            public void onUpSwipe(float value) {
+                message = 2;
+                t.append("UP" + "\n");
+
+            }
+
+            public void onDownSwipe(float value) {
+
+                message = 4;
+                t.append("DOWN" + "\n");
+            }
+
+            public void onRightSwipe(float value) {
+                message = 3;
+                t.append("RIGHT" + "\n");
+            }
+
+            public void onLeftSwipe(float value) {
+                message = 1;
+                t.append("LEFT" + "\n");
+            }
+
+        });
+
+*/
+
     }
 
-    //metodi onclick dei bottoni
-    //passano alla funzione writeint il valore che identifica la direzione (specificata nel server)
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -164,79 +181,12 @@ public class Controlli extends Activity {
     }
 
     @Override
-    protected void onStart() {
-
-        super.onStart();
-        bindService(new Intent(this, BluetoothService.class), mConnection, Context.BIND_AUTO_CREATE);
-
-
-
-    }
-    @Override
-    protected void onStop() {
-
-        super.onStop();
-        // Unbind from the service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-    }
-    @Override
-    protected void onResume() {
-        //indietro o startActivity
-        if (mBound) {
-            bts.getBSL().checkState(this);
-            registerReceiver(bts.getBSL(), new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-            registerReceiver(bts.getBSL(), new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
-            registerReceiver(bts.getBSL(), new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
-        }
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        unregisterReceiver(bts.getBSL());
-        super.onPause();
-    }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
-            bts = binder.getService();
-            mBound = true;
-            bts.streamSetup();
-            bts.getBSL().checkState(Controlli.this);
-
-            registerReceiver(bts.getBSL(), new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-            registerReceiver(bts.getBSL(), new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
-            registerReceiver(bts.getBSL(), new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
-
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
-    @Override
     public void onBackPressed() {
         startActivity(new Intent(this, MainActivity.class));
 
     }
 
-    public void stateConnected(){
-        //Toast.makeText(this,"CONNESSO",Toast.LENGTH_SHORT).show();
+    public void appendi(CharSequence c){
+        t.append(c);
     }
-    public void stateDisconnected(){
-        Toast.makeText(this,"DISCONNESSO",Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this,Connessione.class));
-    }
-
-
 }
