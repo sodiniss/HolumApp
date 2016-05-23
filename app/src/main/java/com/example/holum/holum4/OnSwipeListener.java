@@ -3,7 +3,8 @@ package com.example.holum.holum4;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.GestureDetector;
-public class OnSwipeListener implements View.OnTouchListener{
+import android.view.*;
+public class OnSwipeListener  extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener{
 
     float deltaX ;
     float deltaY ;
@@ -11,10 +12,28 @@ public class OnSwipeListener implements View.OnTouchListener{
     float maxValY;
     float firstTouchX;
     float firstTouchY;
+    float dist;
     float currentX ;
     float currentY ;
     float SWIPE_THRESHOLD = 20.0f;
     float MIN_DISTANCE = 100.0f;
+
+    int n;
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return true;
+    }
+    public float distance(MotionEvent event, int first, int second) {
+        if (event.getPointerCount() >= 2) {
+            final float x = event.getX(first) - event.getX(second);
+            final float y = event.getY(first) - event.getY(second);
+
+            return (float) Math.sqrt(x * x + y * y);
+        } else {
+            return 0;
+        }
+    }
 
 
 
@@ -119,7 +138,7 @@ public class OnSwipeListener implements View.OnTouchListener{
     public void onLeftSwipe(float value) {
 
     }
-    public void onDoubleTap(View v){}
+
 
 
 

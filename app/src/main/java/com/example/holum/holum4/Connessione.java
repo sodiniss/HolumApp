@@ -188,9 +188,14 @@ public class Connessione extends Activity {
             String address = (String)parent.getItemAtPosition(position);                //salva string da arrayadapter
             address = address.substring(address.length() - 17);                           //salva solamente il mac address
             device = BTAdapter.getRemoteDevice(address);                                //seleziona device con quell'address
+            if(device.getUuids()[0].getUuid().equals(uuid)){
+                BTAdapter.cancelDiscovery();
+                bts.setNewDevice(device);
+            }else{
+                Toast.makeText(Connessione.this, "Connessione non accettata",Toast.LENGTH_SHORT).show();
+                device = null;
+            }
 
-            BTAdapter.cancelDiscovery();
-            bts.setNewDevice(device);
 
 
 

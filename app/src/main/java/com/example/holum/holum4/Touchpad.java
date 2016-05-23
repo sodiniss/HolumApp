@@ -37,18 +37,6 @@ public class Touchpad extends View {
 
 
 
-        gt = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                if(getContext().getClass().getSimpleName()=="ControlliTest"){
-                    ControlliTest ct = (ControlliTest) getContext();
-                    ct.appendi("yolo");
-                }
-                return true;
-            }
-
-        });
-
 
 
     }

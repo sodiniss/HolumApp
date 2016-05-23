@@ -1,13 +1,18 @@
 
 package com.example.holum.holum4;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
-
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Action;
+import android.support.v4.app.NotificationCompat.WearableExtender;
+import android.support.v4.app.NotificationManagerCompat;
 import java.util.Objects;
 
 public class BluetoothStateListener extends BroadcastReceiver {
@@ -29,6 +34,7 @@ public class BluetoothStateListener extends BroadcastReceiver {
     String ss,sss;
     String currentAction;
     Intent intent;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         currentAction = intent.getAction();
@@ -69,8 +75,29 @@ public class BluetoothStateListener extends BroadcastReceiver {
         if(state == off) {sss = "OFF";}
         if(state == turningoff) {sss = "TURNING-OFF";}
 
+        NotificationCompat.Builder builderNotifica = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.pyramid2)
+                .setContentTitle("Servizio Holum attivo")
+                .setContentText("Tocca per tornare all'app");
 
+        int idNotifica = 001;
+        Intent resultIntent = new Intent("com.example.holum.holum4.Controlli" );
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        builderNotifica.setContentIntent(resultPendingIntent);
+        NotificationManager managerNotifica = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        if(extrastate == connected){
+            managerNotifica.notify(idNotifica, builderNotifica.build());
+        }
+        if(extrastate == disconnected){
+            managerNotifica.cancel(idNotifica);
+        }
         //Toast.makeText(context,"extrastate = " + ss+" / state = " + sss, Toast.LENGTH_SHORT).show();
         String contextClass = context.getClass().getSimpleName();
         switch (contextClass){

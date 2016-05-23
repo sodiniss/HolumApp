@@ -7,6 +7,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ControlliTest extends Activity {
 
@@ -24,19 +25,16 @@ public class ControlliTest extends Activity {
         gt = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                t.append("ciao");
+                message = 5;
+                t.append("OK\n");
                 return true;
             }
         });
-
-
-
         tp.setOnTouchListener(new OnSwipeListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 gt.onTouchEvent(event);
-                boolean result ;
-
+                boolean result;
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         //Register the first touch on TouchDown and this should not change unless finger goes up.
@@ -115,37 +113,7 @@ public class ControlliTest extends Activity {
                 }
 
                 return result;
-
-            }
-            public void onUpSwipe(float value) {
-                message = 2;
-                t.append("UP" + "\n");
-
-            }
-
-            public void onDownSwipe(float value) {
-
-                message = 4;
-                t.append("DOWN" + "\n");
-            }
-
-            public void onRightSwipe(float value) {
-                message = 3;
-                t.append("RIGHT" + "\n");
-            }
-
-            public void onLeftSwipe(float value) {
-                message = 1;
-                t.append("LEFT" + "\n");
-            }
-        });
-
-
-
-
-        /*
-        tp.setOnTouchListener(new OnSwipeListener() {
-
+                }
             public void onUpSwipe(float value) {
                 message = 2;
                 t.append("UP" + "\n");
@@ -168,11 +136,13 @@ public class ControlliTest extends Activity {
                 t.append("LEFT" + "\n");
             }
 
+
         });
 
-*/
 
-    }
+}
+
+
 
 
     @Override
